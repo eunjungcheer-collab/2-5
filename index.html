@@ -114,6 +114,13 @@ th{color:var(--sub);font-weight:700;background:#f7f5ff;}
 .stu-name{font-weight:700;font-size:15px;}
 .stu-meta{font-size:12px;color:var(--sub);margin-top:2px;}
 .stu-score{font-weight:800;color:var(--p1-dark);font-size:15px;}
+.combo-badge{display:inline-block;background:linear-gradient(90deg,#ff9d4d,#ff5e5e);color:#fff;font-weight:800;font-size:12.5px;padding:4px 10px;border-radius:20px;margin-left:6px;vertical-align:middle;}
+.combo-popup{position:fixed;top:20%;left:50%;transform:translate(-50%,-50%) scale(.92) translateY(8px);z-index:1500;display:flex;align-items:center;gap:9px;padding:13px 24px;border-radius:100px;background:rgba(28,22,54,.78);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 14px 34px rgba(40,28,90,.32),0 0 0 1px rgba(255,255,255,.09) inset;pointer-events:none;text-align:center;animation:comboPop .32s cubic-bezier(.22,.9,.3,1.1) forwards;}
+.combo-popup.combo-out{animation:comboOut .32s ease forwards;}
+.combo-popup .combo-emoji{font-size:21px;line-height:1;}
+.combo-popup .combo-text{font-family:'Noto Sans KR',sans-serif;font-size:16px;font-weight:800;letter-spacing:-.1px;white-space:nowrap;background:linear-gradient(90deg,#fff,#d9c9ff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+@keyframes comboPop{0%{opacity:0;transform:translate(-50%,-50%) scale(.92) translateY(10px);}100%{opacity:1;transform:translate(-50%,-50%) scale(1) translateY(0);}}
+@keyframes comboOut{to{opacity:0;transform:translate(-50%,-50%) scale(.96) translateY(-10px);}}
 @media print{
   body *{visibility:hidden;}
   #printArea, #printArea *{visibility:visible;}
@@ -318,7 +325,8 @@ function newSession(){
   return {name:localStorage.getItem('lastname_'+APP_KEY)||'',cats:[],order:'seq',mode:'full',wrongScope:'all',randomCount:0,
     list:[],idx:0,correct:0,answers:{},wrong:[],
     setSize:20,setIdx:0,selected:null,submitted:false,giveUp:false,
-    lockUntil:0,lockTimerId:null,gsSessionId:null,timeLeft:60,timerId:null};
+    lockUntil:0,lockTimerId:null,gsSessionId:null,timeLeft:60,timerId:null,
+    combo:0,maxCombo:0};
 }
 let state=newSession();
 
@@ -341,7 +349,8 @@ function saveResumeSnapshot(){
   const snap={
     name:state.name, cats:state.cats, order:state.order, mode:state.mode, wrongScope:state.wrongScope,
     list:state.list.map(q=>q._id), idx:state.idx, correct:state.correct, answers:state.answers,
-    wrong:state.wrong, setIdx:state.setIdx, gsSessionId:state.gsSessionId, ts:Date.now()
+    wrong:state.wrong, setIdx:state.setIdx, gsSessionId:state.gsSessionId, ts:Date.now(),
+    combo:state.combo, maxCombo:state.maxCombo
   };
   sset(resumeKey(state.name, state.mode), snap);
 }
@@ -360,6 +369,7 @@ function resumeFromSnapshot(snap){
   state.list=list; state.idx=Math.min(snap.idx,list.length); state.correct=snap.correct||0;
   state.answers=snap.answers||{}; state.wrong=snap.wrong||[]; state.setIdx=snap.setIdx||0;
   state.gsSessionId=snap.gsSessionId||uid();
+  state.combo=snap.combo||0; state.maxCombo=snap.maxCombo||0;
   state.selected=null; state.submitted=false;
   screen='quiz'; render(); startTimerForCurrent();
 }
@@ -463,7 +473,7 @@ function renderLogin(){
   const loginEnabled = !loginConfigCache || loginConfigCache.loginEnabled!==false;
   return `
   <div class="hero">
-    <div class="eyebrow">중2 과학 8단원</div>
+    <div class="eyebrow">중2 과학 5단원</div>
     <h1>식물과 에너지</h1>
     <p>광합성과 호흡, 양분의 이동과 저장까지 ${QUESTIONS.length}제로 완전정복!</p>
   </div>
@@ -476,7 +486,7 @@ function renderLogin(){
     <div class="small-note" style="margin-top:-6px;margin-bottom:8px;">선생님이 알려주신 비밀번호를 입력해 주세요.</div>`:''}
     <button class="btn btn-primary" id="loginBtn">입장하기</button>
   </div>
-  <div class="footer-copy">© 별과 우주 탐험대 · 중2 과학 8단원 ${QUESTIONS.length}제 · build 2026-08</div>
+  <div class="footer-copy">© 중2 과학 5단원 · ${QUESTIONS.length}제 · build 2026-08</div>
   `;
 }
 async function attemptLogin(){
@@ -517,7 +527,7 @@ function renderSetup(){
   }
   return `
   <div class="hero">
-    <div class="eyebrow">중2 과학 8단원</div>
+    <div class="eyebrow">중2 과학 5단원</div>
     <h1>식물과 에너지</h1>
     <p>광합성과 호흡, 양분의 이동과 저장까지 ${QUESTIONS.length}제로 완전정복!</p>
   </div>
@@ -571,7 +581,7 @@ function renderSetup(){
     <div class="giveup" id="logoutBtn" style="margin-top:6px;">🚪 다른 사람으로 로그인</div>
     <div class="giveup" id="storageTestBtn" style="margin-top:6px;">🔧 저장 기능 테스트</div>
   </div>
-  <div class="footer-copy">© 별과 우주 탐험대 · 중2 과학 8단원 ${QUESTIONS.length}제 · build 2026-08</div>
+  <div class="footer-copy">© 중2 과학 5단원 · ${QUESTIONS.length}제 · build 2026-08</div>
   `;
 }
 
@@ -685,6 +695,7 @@ function beginList(list){
   state.list=list;
   state.idx=0;state.correct=0;state.wrong=[];state.answers={};
   state.setIdx=0;state.selected=null;state.submitted=false;state.giveUp=false;
+  state.combo=0;state.maxCombo=0;
   state.gsSessionId=uid();
   screen='quiz';
   render();
@@ -721,7 +732,7 @@ function renderQuiz(){
   return `
   <div class="card">
     <div class="tag">${catName(q.c)}</div>
-    <div class="meta-row"><span>${state.idx+1} / ${total}</span><span>맞은 개수 ${state.correct}</span></div>
+    <div class="meta-row"><span>${state.idx+1} / ${total}</span><span>맞은 개수 ${state.correct}${state.combo>=2?`<span class="combo-badge">🔥 ${state.combo}연속</span>`:''}</span></div>
     <div class="meta-row"><span style="font-weight:700;color:var(--p1-dark);">${state.timeLeft}초</span><span></span></div>
     <div class="timerbar-outer"><div class="timerbar-inner" style="width:${timePct}%;"></div></div>
     ${state.mode==='deep' && !state.submitted ? renderLockCountdown(isLocked) : ''}
@@ -788,14 +799,40 @@ function handleSubmit(timeout){
   state.submitted=true;
   state.lastResult={ok};
   state.answers[q._id]=ok;
-  if(ok){ state.correct++; }
-  else {
+  if(ok){
+    state.correct++;
+    state.combo++;
+    if(state.combo>state.maxCombo) state.maxCombo=state.combo;
+  } else {
     state.wrong=state.wrong.filter(w=>w.id!==q._id);
     state.wrong.push({id:q._id,q:q.q,your:state.selected!=null?q.o[state.selected]:'(제출 안함)',correct:q.o[q.a],explain:q.e,cat:q.c});
+    state.combo=0;
   }
   render();
   saveResumeSnapshot();
   sendProgressToSheet(false);
+  if(ok && isComboMilestone(state.combo)) showComboPopup(state.combo);
+}
+
+/* ============ 콤보(연속 정답) ============
+   3콤보에서 처음 터지고, 그 뒤로는 5콤보마다(5,10,15,20...) 화면 가운데에 팝업이 떴다가
+   자동으로 사라져요. 오답 한 번이면 콤보는 0으로 리셋돼요. */
+function isComboMilestone(n){ return n===3 || (n>0 && n%5===0); }
+function comboMessage(n){
+  if(n>=30) return {emoji:'👑',msg:n+'연속 정답'};
+  if(n>=20) return {emoji:'💎',msg:n+'연속 정답'};
+  if(n>=10) return {emoji:'⚡',msg:n+'연속 정답'};
+  if(n>=5)  return {emoji:'🔥',msg:n+'연속 정답'};
+  return {emoji:'✨',msg:n+'연속 정답'};
+}
+function showComboPopup(n){
+  const {emoji,msg}=comboMessage(n);
+  const el=document.createElement('div');
+  el.className='combo-popup';
+  el.innerHTML=`<div class="combo-emoji">${emoji}</div><div class="combo-text">${msg}</div>`;
+  document.body.appendChild(el);
+  setTimeout(()=>{ el.classList.add('combo-out'); },900);
+  setTimeout(()=>{ el.remove(); },1300);
 }
 
 function goNext(){
@@ -851,8 +888,8 @@ function fanfareTier(score,pct){
     if(score>=80) return {tier:'f80',msg:'고생했어요! 🌱 다음엔 모든 문제를 풀면 더 좋아요!'};
     return null;
   }
-  if(score>=100) return {tier:'f100',msg:'🎉🎉 당신은 우주 박사! 존경합니다! 🎉🎉'};
-  if(score>=95) return {tier:'f95',msg:'너무너무 잘했어요! 당신은 별과 우주 전문가! ⭐'};
+  if(score>=100) return {tier:'f100',msg:'🎉🎉 당신은 이 단원 만점 박사! 존경합니다! 🎉🎉'};
+  if(score>=95) return {tier:'f95',msg:'너무너무 잘했어요! 당신은 이 단원 전문가! ⭐'};
   if(score>=90) return {tier:'f90',msg:'잘했어요! 최고예요! 👏'};
   if(score>=80) return {tier:'f80',msg:'고생했어요! 🌱'};
   return null;
@@ -866,7 +903,7 @@ function renderResult(){
   <div class="card" style="text-align:center;">
     ${state.giveUp?`<div class="warnbox">⚠️ ${tot}문제 중 ${ans}문제만 풀고 제출했어요</div>`:''}
     <div class="score-big">${s}<span style="font-size:22px;">점</span></div>
-    <div class="score-sub">맞은 개수 ${state.correct} / ${tot} · 정답률 ${ans>0?Math.round(state.correct/ans*100):0}%</div>
+    <div class="score-sub">맞은 개수 ${state.correct} / ${tot} · 정답률 ${ans>0?Math.round(state.correct/ans*100):0}%${state.maxCombo>=3?` · 최고 연속 🔥${state.maxCombo}콤보`:''}</div>
     <div class="gauge"><div class="mark" style="left:${gaugePos}%;"></div></div>
     <div class="gauge-labels"><span>노력 중</span><span>좋아요</span><span>완벽 마스터</span></div>
     ${fan?`<div class="fanfare ${fan.tier}">${fan.msg}</div>`:`<div class="fanfare f80">🌱 괜찮아요, 틀린 문제를 다시 보면 금방 늘어요!</div>`}
