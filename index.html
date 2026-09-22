@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>식물과 에너지 100제</title>
+<title>식물과 에너지 130제</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
@@ -173,13 +173,15 @@ const CATS = [
 {id:"resp",name:"식물의 호흡",icon:"🫁"},
 {id:"respexp",name:"호흡 실험",icon:"⚗️"},
 {id:"relation",name:"광합성과 호흡 비교",icon:"🔄"},
-{id:"storage",name:"양분의 이동과 저장",icon:"🥔"}
+{id:"storage",name:"양분의 이동과 저장",icon:"🥔"},
+{id:'oxreason', name:'OX 함정문장 찾기', icon:'🎯'}
 ];
 
 function M(c,q,o,a,e,img){return {c,t:'mcq',q,o,a,e,img:img||null};}
 /* 블록 터치형 문제(철자/기호를 순서대로 눌러서 완성하는 방식).
    answer: 정답 문자열(예: 'He'), blocks: 화면에 흩어놓을 글자 타일 배열(정답 글자 + 헷갈리는 글자 섞어서). */
 function B(c,q,answer,blocks,e){return {c,t:'blocks',q,answer,blocks,e};}
+function OX(c,q,isTrue,reasons,ra,e){return {c,t:'ox2',q,isTrue,reasons:reasons||[],ra:(ra===undefined?null:ra),e};}
 
 const QUESTIONS = [
 M("basics","광합성은 식물이 빛에너지를 이용하여 이산화 탄소와 물을 원료로 무엇을 만드는 과정인가?",["이산화 탄소", "산소만", "질소 화합물", "양분(포도당)"],3,"광합성은 빛에너지를 이용해 이산화 탄소와 물을 원료로 양분(포도당)을 만드는 과정이다.",null),
@@ -282,6 +284,82 @@ M("storage","콩에 주로 저장되는 양분의 형태는?",["설탕", "지방
 M("storage","땅콩, 깨에 주로 저장되는 양분의 형태는?",["녹말", "포도당", "설탕", "지방"],3,"땅콩과 깨는 지방 형태로 양분을 저장한다.",null),
 M("storage","식물 줄기의 바깥쪽 껍질을 고리 모양으로 벗겨내는 환상 박피 실험에서, 벗겨낸 부분의 윗부분이 부풀어 오르고 아랫부분보다 열매가 크게 자라는 까닭은?",["뿌리가 손상되었기 때문", "물관이 제거되어 물이 위로 이동하지 못하기 때문", "체관이 제거되어 양분이 아래로 이동하지 못하기 때문", "엽록체가 파괴되었기 때문"],2,"환상 박피로 체관이 제거되면 잎에서 만든 양분이 아래로 이동하지 못해 벗겨낸 부분 위쪽에 쌓이면서 부풀어 오르고 그 위의 열매가 더 크게 자란다.",null),
 M("storage","환상 박피 실험에서 벗겨져 제거되는 관은 물관과 체관 중 무엇이며, 그 까닭은?",["체관 - 줄기 가장 안쪽에 있어서", "물관 - 체관보다 바깥쪽에 있어서", "물관 - 줄기 가장 안쪽에 있어서", "체관 - 물관보다 바깥쪽에 있어서"],3,"체관은 물관보다 바깥쪽에 존재하기 때문에, 줄기의 바깥쪽 껍질을 벗겨내면 체관이 제거된다.",null),
+OX("oxreason","광합성은 식물 세포 속 엽록체에서 빛에너지를 이용해 물과 이산화 탄소로 양분과 산소를 만드는 과정이다.",true,[],null,"광합성은 엽록체에서 빛에너지를 흡수하여 물과 이산화 탄소를 원료로 포도당과 산소를 만드는 과정이다."),
+OX("oxreason","광합성의 원료는 물과 이산화 탄소이며, 그 결과 포도당과 이산화 탄소가 생성된다.",false,
+  ["광합성 결과 생성되는 기체는 이산화 탄소가 아니라 산소이기 때문","광합성의 원료인 이산화 탄소는 뿌리에서 흡수되기 때문","광합성 결과 포도당이 아니라 녹말만 생성되기 때문"],
+  0,"광합성은 빛에너지를 이용해 물과 이산화 탄소를 원료로 포도당과 산소를 만드는 과정이다."),
+OX("oxreason","광합성은 엽록체가 아니라 미토콘드리아에서 일어난다.",false,
+  ["미토콘드리아는 식물세포에는 들어 있지 않기 때문","광합성은 미토콘드리아가 아니라 엽록체에서 일어나기 때문","광합성은 세포 밖에서 일어나는 반응이기 때문"],
+  1,"광합성은 초록색 알갱이인 엽록체에서 일어나며, 미토콘드리아는 호흡이 일어나는 장소이다."),
+OX("oxreason","검정말을 넣은 BTB 용액이 빛을 받아 광합성이 활발해지면 용액 속 이산화 탄소가 늘어나 노란색이 더 진해진다.",false,
+  ["BTB 용액은 산소 농도가 변할 때만 색이 바뀌는 지시약이기 때문","검정말은 빛을 받아도 이산화 탄소를 전혀 이용하지 못하기 때문","광합성을 하면 이산화 탄소가 늘어나는 것이 아니라 줄어들기 때문"],
+  2,"검정말이 광합성을 하면 용액 속 이산화 탄소를 흡수해 농도가 줄어들어 BTB 용액이 파란색으로 변한다."),
+OX("oxreason","검정말을 넣은 BTB 용액에 빛을 충분히 비추면 광합성으로 이산화 탄소가 줄어들어 용액이 파란색으로 변한다.",true,[],null,"광합성이 활발해지면 이산화 탄소가 소모되어 BTB 용액이 노란색에서 파란색으로 변한다."),
+OX("oxreason","아이오딘-아이오딘화 칼륨 용액은 포도당과 직접 반응하여 청람색으로 변하므로 광합성 산물 확인에 이용된다.",false,
+  ["아이오딘-아이오딘화 칼륨 용액은 포도당이 아니라 녹말과 반응해 청람색을 나타내기 때문","아이오딘-아이오딘화 칼륨 용액은 산소와 반응해야만 색이 변하기 때문","포도당은 애초에 색깔이 있는 물질이라 반응할 필요가 없기 때문"],
+  0,"아이오딘-아이오딘화 칼륨 용액은 녹말과 반응하여 청람색을 나타내므로 광합성 결과 녹말이 생성되었는지 확인하는 데 쓰인다."),
+OX("oxreason","아이오딘-아이오딘화 칼륨 용액은 녹말과 반응하여 청람색으로 변하므로 광합성 결과 녹말이 생성되었는지 확인하는 데 이용된다.",true,[],null,"아이오딘-아이오딘화 칼륨 용액은 녹말과 반응해 청람색을 나타내는 지시약이다."),
+OX("oxreason","잎을 에탄올에 넣어 물중탕하는 까닭은 엽록체를 완전히 없애 광합성이 일어나지 않게 하기 위해서이다.",false,
+  ["에탄올 물중탕은 잎 속의 녹말을 모두 분해해서 없애는 과정이기 때문","에탄올 물중탕은 엽록소만 빼내는 과정으로, 엽록체 구조 자체는 그대로 남기 때문","에탄올 물중탕은 세포벽을 녹여 잎을 투명하게 만드는 과정이기 때문"],
+  1,"에탄올 물중탕은 엽록소를 빼내 잎을 탈색시켜, 아이오딘 반응의 색 변화를 더 잘 관찰하기 위한 과정이다."),
+OX("oxreason","온도가 높아질수록 광합성량은 제한 없이 계속 증가한다.",false,
+  ["온도는 광합성량과 아무런 관련이 없는 요인이기 때문","온도가 낮을수록 광합성량이 계속 증가하기 때문","온도가 일정 수준(약 40℃ 부근) 이상으로 높아지면 광합성량이 오히려 급격히 감소하기 때문"],
+  2,"온도가 높아질수록 광합성량은 증가하다가 약 40℃ 부근 이상에서는 급격히 감소한다."),
+OX("oxreason","이산화 탄소의 농도가 높아질수록 광합성량은 끝없이 계속 증가한다.",false,
+  ["이산화 탄소 농도가 일정 수준 이상이 되면 광합성량이 더 이상 증가하지 않고 일정해지기 때문","이산화 탄소 농도가 높아지면 오히려 광합성량이 줄어들기 때문","이산화 탄소는 광합성이 아니라 호흡에서만 이용되는 기체이기 때문"],
+  0,"이산화 탄소 농도는 증가할수록 광합성량이 증가하다가 어느 수준 이상이 되면 더 이상 늘지 않고 일정해진다."),
+OX("oxreason","빛의 세기가 강해질수록 광합성량은 증가하지만, 어느 정도 이상이 되면 더 이상 증가하지 않고 일정해진다.",true,[],null,"빛의 세기가 강할수록 광합성량은 증가하다가 어느 정도 이상이 되면 일정해진다."),
+OX("oxreason","식물의 호흡은 빛이 있는 낮에만 일어나고 밤에는 멈춘다.",false,
+  ["호흡은 빛에너지를 직접 이용해야만 일어날 수 있는 과정이기 때문","호흡은 낮과 밤에 관계없이 살아있는 모든 세포에서 항상 일어나기 때문","호흡은 잎에 있는 엽록체에서만 일어나는 과정이기 때문"],
+  1,"호흡은 산소를 이용해 양분을 분해하여 에너지를 얻는 과정으로, 낮과 밤 구분 없이 식물의 모든 세포에서 항상 일어난다."),
+OX("oxreason","호흡은 잎에서만 일어나고 뿌리나 줄기의 세포에서는 일어나지 않는다.",false,
+  ["호흡은 뿌리에서만 일어나고 잎에서는 일어나지 않기 때문","호흡은 광합성이 일어난 세포에서만 뒤이어 일어나기 때문","호흡은 잎뿐 아니라 식물을 이루는 모든 세포에서 일어나기 때문"],
+  2,"호흡은 살아있는 식물의 모든 세포에서 항상 일어나는 과정이다."),
+OX("oxreason","호흡은 산소를 이용해 양분을 분해하여 에너지를 얻는 과정으로, 식물의 모든 세포에서 낮과 밤 구분 없이 항상 일어난다.",true,[],null,"호흡은 살아있는 모든 세포에서 낮과 밤에 관계없이 항상 일어나는 과정이다."),
+OX("oxreason","낮에는 광합성량이 호흡량보다 많아 식물은 전체적으로 산소를 흡수하고 이산화 탄소를 방출한다.",false,
+  ["낮에는 광합성량이 호흡량보다 많아 반대로 이산화 탄소를 흡수하고 산소를 방출하기 때문","낮에는 광합성이 일어나지 않고 호흡만 활발해지기 때문","낮과 밤의 기체 출입은 항상 같아서 차이가 없기 때문"],
+  0,"낮에는 광합성량이 호흡량보다 많아 식물은 이산화 탄소를 흡수하고 산소를 방출하는 것처럼 보인다."),
+OX("oxreason","겨울에 잎이 모두 떨어진 나무는 낮에도 광합성을 활발히 하여 산소를 방출한다.",false,
+  ["겨울에는 온도가 낮아 호흡이 완전히 멈추기 때문","잎이 없으면 광합성이 일어나지 않아 낮에도 호흡만 하며 산소를 흡수하고 이산화 탄소를 방출하기 때문","겨울눈에서 광합성이 대신 활발히 일어나기 때문"],
+  1,"광합성은 잎에서 일어나므로 잎이 다 떨어진 겨울 나무는 낮에도 호흡만 하여 산소를 흡수하고 이산화 탄소를 방출한다."),
+OX("oxreason","광합성 결과 최초로 생성되는 양분은 녹말이며, 이 녹말이 나중에 포도당으로 바뀐다.",false,
+  ["광합성 결과 최초로 생성되는 물질은 설탕이기 때문","녹말은 광합성이 아니라 호흡 과정에서 만들어지는 물질이기 때문","광합성 결과 최초로 생성되는 양분은 포도당이며, 이 포도당이 녹말로 바뀌어 저장되기 때문"],
+  2,"광합성 결과 최초로 생성되는 산물은 포도당이며, 물에 잘 녹지 않는 녹말로 바뀌어 잎에 잠시 저장된다."),
+OX("oxreason","잎에 저장된 녹말은 밤이 되면 물관을 통해 다른 기관으로 이동한다.",false,
+  ["저장된 녹말은 물에 잘 녹는 설탕으로 바뀌어 물관이 아니라 체관을 통해 이동하기 때문","녹말은 형태가 바뀌지 않은 채로 체관을 통해 이동하기 때문","녹말은 밤이 아니라 낮에만 다른 기관으로 이동하기 때문"],
+  0,"밤이 되면 저장된 녹말은 물에 잘 녹는 설탕 형태로 바뀌어 체관을 통해 식물의 각 기관으로 이동한다."),
+OX("oxreason","물관은 광합성으로 만들어진 양분이 이동하는 통로이고, 체관은 뿌리에서 흡수한 물이 이동하는 통로이다.",false,
+  ["물관과 체관은 이동하는 물질이 같아서 구분할 필요가 없기 때문","물관은 물이 이동하는 통로이고, 체관은 양분이 이동하는 통로로 서로 반대이기 때문","물관은 산소가 이동하는 통로이고, 체관은 이산화 탄소가 이동하는 통로이기 때문"],
+  1,"물관은 뿌리에서 흡수한 물이 이동하는 통로이고, 체관은 광합성으로 만들어진 양분이 이동하는 통로이다."),
+OX("oxreason","물관은 뿌리에서 흡수한 물이 이동하는 통로이고, 체관은 광합성으로 만든 양분이 이동하는 통로이다.",true,[],null,"물관은 물의 이동 통로, 체관은 양분의 이동 통로로 서로 역할이 다르다."),
+OX("oxreason","환상 박피 실험에서 나무의 줄기 바깥쪽 껍질을 고리 모양으로 벗겨내면 물관이 제거되어 물을 전혀 흡수하지 못하게 된다.",false,
+  ["환상 박피는 뿌리를 직접 제거하는 실험이기 때문","환상 박피로 물관과 체관이 모두 제거되어 식물이 즉시 시들기 때문","환상 박피로 제거되는 것은 바깥쪽에 있는 체관이며, 안쪽의 물관은 남아 있어 물은 계속 이동할 수 있기 때문"],
+  2,"환상 박피는 줄기 바깥쪽의 체관을 제거하는 것으로, 안쪽의 물관은 그대로 남아 물은 계속 이동할 수 있다."),
+OX("oxreason","환상 박피를 하면 벗겨낸 부위의 아래쪽이 부풀어 오른다.",false,
+  ["체관이 끊겨 잎에서 만든 양분이 아래로 내려가지 못해 벗겨낸 부위의 위쪽이 부풀어 오르기 때문","물이 위로 이동하지 못해 벗겨낸 부위 아래쪽에 물이 고이기 때문","벗겨낸 부위 아래쪽 세포가 빠르게 분열하여 부피가 커지기 때문"],
+  0,"환상 박피로 체관이 끊기면 잎에서 만들어진 양분이 아래로 이동하지 못해 벗겨낸 부위의 위쪽이 부풀어 오른다."),
+OX("oxreason","환상 박피를 하면 벗겨낸 부위의 체관이 제거되어 그 위쪽에 양분이 쌓여 부풀어 오른다.",true,[],null,"환상 박피로 체관이 끊기면 잎에서 만든 양분이 그 위쪽에 쌓여 부풀어 오른다."),
+OX("oxreason","감자는 주로 지방의 형태로, 콩은 주로 녹말의 형태로 양분을 저장한다.",false,
+  ["감자와 콩은 모두 양분을 저장하지 않는 식물이기 때문","감자는 주로 녹말로, 콩은 주로 단백질로 양분을 저장하여 서로 형태가 바뀌어 있기 때문","감자와 콩은 모두 설탕 형태로만 양분을 저장하기 때문"],
+  1,"감자는 뿌리(덩이줄기)에 녹말 형태로, 콩은 씨에 단백질 형태로 양분을 저장한다."),
+OX("oxreason","포도는 열매에 녹말 형태로, 사탕수수는 줄기에 지방 형태로 양분을 저장한다.",false,
+  ["포도와 사탕수수는 모두 씨에 단백질 형태로 저장하기 때문","포도와 사탕수수는 양분을 저장하지 않고 바로 소모하기 때문","포도는 열매에 포도당으로, 사탕수수는 줄기에 설탕 형태로 저장하기 때문"],
+  2,"포도는 열매에 포도당 형태로, 사탕수수는 줄기에 설탕 형태로 양분을 저장한다."),
+OX("oxreason","광합성 결과 발생한 산소는 식물 자신의 호흡에는 이용되지 못하고 모두 공기 중으로 빠져나간다.",false,
+  ["광합성으로 발생한 산소 중 일부는 식물 자신의 호흡에도 이용되기 때문","광합성 결과 산소가 아니라 이산화 탄소가 발생하기 때문","식물은 산소를 이용해 호흡하지 않고 이산화 탄소로 호흡하기 때문"],
+  0,"광합성 결과 발생한 산소는 식물 자신의 호흡에 이용되기도 하고, 남는 것은 기공을 통해 공기 중으로 빠져나가 동물의 호흡에도 이용된다."),
+OX("oxreason","석회수를 뿌옇게 흐리게 만드는 기체는 산소이며, 이는 식물의 광합성 결과 발생한다.",false,
+  ["석회수는 원래 기체와 반응하지 않고 온도에 의해서만 흐려지기 때문","석회수를 뿌옇게 흐리게 만드는 기체는 산소가 아니라 이산화 탄소이기 때문","석회수를 흐리게 만드는 기체는 질소이기 때문"],
+  1,"이산화 탄소는 석회수를 뿌옇게 흐리게 만들며, 이는 식물의 호흡 결과 발생하는 기체이다."),
+OX("oxreason","콩이 싹을 틔울 때는 광합성이 활발히 일어나 발생한 산소로 인해 페트병 속 온도가 낮아진다.",false,
+  ["콩이 싹틀 때는 아무런 기체 출입이 일어나지 않기 때문","콩이 싹틀 때 발생하는 기체는 산소이지만 온도와는 무관하기 때문","콩이 싹틀 때는 호흡이 왕성하게 일어나 이산화 탄소가 발생하고 에너지(열)가 나와 온도가 오히려 높아지기 때문"],
+  2,"콩이 싹틀 때는 호흡이 왕성하게 일어나 이산화 탄소가 발생하고, 에너지가 방출되어 온도가 높아진다."),
+OX("oxreason","빛이 차단된 어두운 곳에 둔 시금치는 광합성만 일어나 산소를 방출하므로 석회수가 맑게 유지된다.",false,
+  ["어두운 곳에서는 광합성이 일어나지 않고 호흡만 일어나 이산화 탄소를 방출하므로 석회수가 뿌옇게 흐려지기 때문","어두운 곳에서는 호흡과 광합성이 모두 멈추기 때문","석회수는 빛의 유무와 관계없이 항상 맑게 유지되는 용액이기 때문"],
+  0,"어두운 곳에 둔 식물은 호흡만 하여 이산화 탄소를 방출하므로 석회수를 통과시키면 뿌옇게 흐려진다."),
+OX("oxreason","빛의 세기가 세질수록 시금치 잎 조각이 물 위로 떠오르는 데 걸리는 시간이 점점 길어진다.",false,
+  ["빛의 세기는 잎 조각이 뜨는 시간과 관계가 없기 때문","빛의 세기가 세질수록 광합성이 활발해져 산소가 더 빨리 발생하므로 떠오르는 시간이 짧아지기 때문","빛의 세기가 세질수록 오히려 호흡이 활발해져 이산화 탄소가 더 많이 발생하기 때문"],
+  1,"빛의 세기가 세질수록 광합성이 활발해져 산소가 빨리 발생하므로 잎 조각이 떠오르는 데 걸리는 시간이 짧아진다."),
 ];
 
 /* ============ APP CONFIG ============ */
@@ -331,7 +409,7 @@ async function getStudentPassword(){ const c=await getLoginConfig(); return c.pa
 function newSession(){
   return {name:localStorage.getItem('lastname_'+APP_KEY)||'',cats:[],order:'seq',mode:'full',wrongScope:'all',randomCount:0,
     list:[],idx:0,correct:0,answers:{},wrong:[],combo:0,maxCombo:0,
-    setSize:20,setIdx:0,selected:null,blockPicks:[],submitted:false,giveUp:false,
+    setSize:20,setIdx:0,selected:null,blockPicks:[],submitted:false,giveUp:false,ox2Stage:1,
     lockUntil:0,lockTimerId:null,gsSessionId:null,timeLeft:60,timerId:null};
 }
 let state=newSession();
@@ -534,7 +612,7 @@ function renderLogin(){
   <div class="hero">
     <div class="eyebrow">중2과학 5단원 식물과 에너지</div>
     <h1>식물과 에너지</h1>
-    <p>광합성부터 호흡까지, 100제로 완전정복! ${QUESTIONS.length}제로 완전정복!</p>
+    <p>광합성부터 호흡까지, OX 함정문장까지! ${QUESTIONS.length}제로 완전정복!</p>
   </div>
   <div class="card">
     <label class="field-label">🙋 이름(아이디)을 입력해줘</label>
@@ -594,7 +672,7 @@ function renderSetup(){
   <div class="hero">
     <div class="eyebrow">중2과학 5단원 식물과 에너지</div>
     <h1>식물과 에너지</h1>
-    <p>광합성부터 호흡까지, 100제로 완전정복! ${QUESTIONS.length}제로 완전정복!</p>
+    <p>광합성부터 호흡까지, OX 함정문장까지! ${QUESTIONS.length}제로 완전정복!</p>
   </div>
   <div class="card">
     <label class="field-label">👋 ${state.name}님, 반가워요!</label>
@@ -759,7 +837,7 @@ function beginList(list){
   clearResumeSnapshot(state.name);
   state.list=list;
   state.idx=0;state.correct=0;state.wrong=[];state.answers={};
-  state.setIdx=0;state.selected=null;state.blockPicks=[];state.submitted=false;state.giveUp=false;
+  state.setIdx=0;state.selected=null;state.blockPicks=[];state.submitted=false;state.giveUp=false;state.ox2Stage=1;
   state.gsSessionId=uid();
   screen='quiz';
   render();
@@ -800,6 +878,37 @@ function renderBlocksUI(q,isLocked){
   `;
 }
 
+function renderOX2UI(q,isLocked){
+  if(state.ox2Stage===2){
+    return q.reasons.map((r,i)=>{
+      let cls='choice';
+      if(state.submitted){
+        if(i===q.ra) cls+=' correct';
+        else if(i===state.selected) cls+=' wrong';
+      } else if(isLocked){
+        cls+=' locked';
+      } else if(state.selected===i){
+        cls+=' sel';
+      }
+      return `<div class="${cls}" data-idx="${i}">${['①','②','③'][i]} ${r}</div>`;
+    }).join('');
+  }
+  const labels=['⭕ 맞는 문장이에요','❌ 틀린 문장이에요'];
+  const correctIdx=q.isTrue?0:1;
+  return labels.map((label,i)=>{
+    let cls='choice';
+    if(state.submitted){
+      if(i===correctIdx) cls+=' correct';
+      else if(i===state.selected) cls+=' wrong';
+    } else if(isLocked){
+      cls+=' locked';
+    } else if(state.selected===i){
+      cls+=' sel';
+    }
+    return `<div class="${cls}" data-idx="${i}">${label}</div>`;
+  }).join('');
+}
+
 function renderQuiz(){
   const q=currentQ();
   if(!q) return renderResult();
@@ -808,7 +917,8 @@ function renderQuiz(){
   const submittedInfo=state.submitted?state.lastResult:null;
   const isLocked=state.mode==='deep' && !state.submitted && Date.now()<state.lockUntil;
   const isBlocks=q.t==='blocks';
-  const choicesHtml=isBlocks ? renderBlocksUI(q,isLocked) : q.o.map((opt,i)=>{
+  const isOX2=q.t==='ox2';
+  const choicesHtml=isBlocks ? renderBlocksUI(q,isLocked) : isOX2 ? renderOX2UI(q,isLocked) : q.o.map((opt,i)=>{
     let cls='choice';
     if(state.submitted){
       if(i===q.a) cls+=' correct';
@@ -825,6 +935,7 @@ function renderQuiz(){
     const ok=submittedInfo.ok;
     feedback=`<div class="explain-box ${ok?'right':''}"><b>${ok?'정답이에요! 🎉':'아쉬워요! 다시 확인해볼까요?'}</b>${q.e}</div>`;
   }
+  const ox2StageTag=isOX2 ? (state.ox2Stage===2 ? '<div class="tag" style="background:#fdeceb;color:#c0392b;">2단계 · 이 문장이 틀린 진짜 이유는?</div>' : '<div class="tag">1단계 · 이 문장, 맞을까요 틀릴까요?</div>') : '';
   return `
   <div class="card">
     <div class="tag">${catName(q.c)}</div>
@@ -835,6 +946,7 @@ function renderQuiz(){
     ${(state.combo||0)>=2?`<div class="combo-badge">🔥 ${state.combo}연속 정답!</div>`:''}
     <div class="qtext">Q${state.idx+1}. ${q.q}</div>
     ${q.img && IMG[q.img] ? `<img class="qimg" src="${IMG[q.img]}" alt="참고 그림">` : ''}
+    ${ox2StageTag}
     <div id="choicesWrap">${choicesHtml}</div>
     ${feedback}
     ${state.submitted?
@@ -890,6 +1002,14 @@ function autoSubmitTimeout(){ if(!state.submitted){handleSubmit(true);} }
 function handleSubmit(timeout){
   clearInterval(state.timerId);
   const q=currentQ();
+  if(q.t==='ox2' && state.ox2Stage===1 && !(timeout && state.selected==null)){
+    const pick=state.selected===0?'O':'X';
+    if(!q.isTrue && pick==='X'){
+      state.ox2Stage=2; state.selected=null;
+      render();
+      return;
+    }
+  }
   let ok=false;
   let yourAnswerText='(제출 안함)';
   let correctAnswerText;
@@ -898,6 +1018,31 @@ function handleSubmit(timeout){
     ok = !timeout && typed===q.answer;
     yourAnswerText = typed || '(제출 안함)';
     correctAnswerText = q.answer;
+  } else if(q.t==='ox2'){
+    const correctFirstText = q.isTrue ? '⭕ 맞는 문장' : ('❌ 틀린 문장 · '+q.reasons[q.ra]);
+    if(state.ox2Stage===1){
+      if(timeout && state.selected==null){
+        ok=false; yourAnswerText='(제출 안함)';
+      } else {
+        const pick=state.selected===0?'O':'X';
+        if(q.isTrue){
+          ok = pick==='O';
+          yourAnswerText = pick==='O' ? '⭕ 맞는 문장' : '❌ 틀린 문장';
+        } else {
+          ok=false;
+          yourAnswerText='⭕ 맞는 문장';
+        }
+      }
+      correctAnswerText = correctFirstText;
+    } else {
+      if(timeout && state.selected==null){
+        ok=false; yourAnswerText='(이유 선택 안함)';
+      } else {
+        ok = state.selected===q.ra;
+        yourAnswerText = state.selected!=null ? ('❌ 틀린 문장 · '+q.reasons[state.selected]) : '(이유 선택 안함)';
+      }
+      correctAnswerText = correctFirstText;
+    }
   } else {
     if(timeout && state.selected==null){ ok=false; }
     else { ok=state.selected===q.a; }
@@ -923,7 +1068,7 @@ function handleSubmit(timeout){
 
 function goNext(){
   state.idx++;
-  state.selected=null;state.blockPicks=[];state.submitted=false;
+  state.selected=null;state.blockPicks=[];state.submitted=false;state.ox2Stage=1;
   if(state.idx>=state.list.length){ finishQuiz(); return; }
   if(state.mode==='focus' && state.idx>0 && state.idx%state.setSize===0){
     screen='setresult';render();return;
